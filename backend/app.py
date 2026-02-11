@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pandas as pd
 import os
+import uuid
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -29,14 +31,41 @@ def add_expense():
     """Add a new expense"""
     try:
         data = request.json
-        df = pd.DataFrame([data])
-        
+        # validate input
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        description = data.get("description","").strip()
+        amount = data.get("amount")
+        if description == "":
+            return jsonify({"error": "Description cannot be empty"}), 400
+        try:
+            amount = float(amount)
+            if amount <= 0:
+                return jsonify({"error": "Amount must be greater than 0"}), 400
+        except:
+            return jsonify({"error": "Amount must be a number"}), 400
+        # generate UUID
+        expense_id = str(uuid.uuid4())
+        # generate timestamp
+        current_time = datetime.now().isoformat()
+        # default catgegory (temporary)
+        category = "other"
+        # create expense object
+        new_expense = {
+            "id": expense_id,
+            "date": current_time,
+            "description": description,
+            "amount": amount,
+            "category": category
+        }
+        # save to CSV
+        df = pd.DataFrame([new_expense])
         if os.path.exists(DATA_PATH):
             existing_df = pd.read_csv(DATA_PATH)
-            df = pd.concat([existing_df, df], ignore_index=True)
-        
-        df.to_csv(DATA_PATH, index=False)
-        return jsonify({"message": "Expense added successfully"}), 201
+            df = pd.concat([existing_df, df], ignore_index = True)
+        df.to_csv(DATA_PATH, index = False)
+        #return created expense
+        return jsonify(new_expense), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
