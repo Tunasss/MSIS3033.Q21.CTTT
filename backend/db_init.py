@@ -20,7 +20,10 @@ CATEGORIES = {
     "Shopping" : 0,
     "Traveling" : 0,
     "Utilities" : 0,
-    "Other" :0
+    "Study" : 0,
+    "Housing" : 0,
+    "Health": 0,
+    "Other" : 0
 }
 
 def init_db():
