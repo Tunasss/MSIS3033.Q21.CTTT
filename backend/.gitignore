@@ -1,0 +1,7 @@
+﻿# Backend local dev artifacts
+pip_freeze.txt
+requirements.local.txt
+
+# Python cache
+__pycache__/
+*.py[cod]
