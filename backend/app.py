@@ -103,6 +103,17 @@ def add_expense():
             existing_df = pd.read_csv(EXPENSE_PATH)
             df = pd.concat([existing_df, df], ignore_index = True)
         df.to_csv(EXPENSE_PATH, index = False)
+        # save category limits.json
+        if os.path.exists(LIMIT_PATH):
+            with open(LIMIT_PATH,"r") as f:
+                limits = json.load(f)
+        else:
+            limits = {}
+        # update the limit of specified category
+        limits[category] = 0
+        # save back to limits.json
+        with open(LIMIT_PATH, "w") as f:
+            json.dump(limits, f, indent = 4)
         #return created expense
         return jsonify(new_expense), 201
     except Exception as e:
