@@ -208,9 +208,10 @@ def get_summary():
             return jsonify({"error": "CSV missing required columns: amount/category"}), 500
 
         df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
-        df["category"] = df["category"].astype(str).fillna("")
+        df["amount"] = df["amount"].round(0).astype(int)
+        df["category"] = df["category"].fillna("").astype(str).str.strip()
 
-        total_spending = int(round(float(df["amount"].sum())))
+        total_spending = int(df["amount"].sum())
 
         spent_map = df.groupby("category")["amount"].sum().to_dict()
 
@@ -221,7 +222,7 @@ def get_summary():
 
         categories_out = []
         for cat in all_cats:
-            spent = int(round(float(spent_map.get(cat, 0))))
+            spent = int(spent_map.get(cat, 0))
             lim = limits.get(cat, None)
             categories_out.append({
                 "category": cat,
