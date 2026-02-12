@@ -24,3 +24,7 @@ Thumbs.db
 
 # Machine learning models (if large)
 *.pkl.gz
+
+# Local data folder
+data/
+
