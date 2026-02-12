@@ -111,6 +111,19 @@ def set_limit():
         }),200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@app.route('/api/limits', methods=['GET'])
+def get_limits():
+    """Get all category limits"""
+    try:
+        if os.path.exists(LIMIT_PATH):
+            with open(LIMIT_PATH, "r") as f:
+                limits = json.load(f)
+            return jsonify(limits), 200
+        else:
+            return jsonify({}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 if __name__ == '__main__':
     init_db()
     app.run(debug=False, host='0.0.0.0', port=5000)
