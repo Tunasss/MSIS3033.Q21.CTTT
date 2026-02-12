@@ -13,18 +13,6 @@ COLUMNS = [
     "amount",      # float
     "category"     # str
 ]
-CATEGORIES = {
-    "Food" : 0,
-    "Transport" : 0,
-    "Entertainment" :0,
-    "Shopping" : 0,
-    "Traveling" : 0,
-    "Utilities" : 0,
-    "Study" : 0,
-    "Housing" : 0,
-    "Health": 0,
-    "Other" : 0
-}
 
 def init_db():
     # create data folder if not exists
@@ -41,7 +29,7 @@ def init_db():
     # create limits.json
     if not os.path.exists(LIMIT_PATH):
         with open(LIMIT_PATH,'w') as f:
-            json.dump(CATEGORIES,f)
+            json.dump({},f)
             print("limits.json created")
     else:
         print("limits.json already exists")
