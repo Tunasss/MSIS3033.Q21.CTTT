@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Expense App</title>
+    <style>
+        body { 
+            font-family: Arial; 
+            margin: 0; 
+            padding: 20px; 
+        }
+
+        .hidden { 
+            display: none; 
+        }
+
+        nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: #eee; 
+            padding: 10px; 
+            text-align: center; 
+        }
+
+        button { 
+            padding: 8px 12px; 
+            margin: 5px; 
+            cursor: pointer;
+        }
+
+        input {
+            padding: 6px;
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1 id="pageTitle">Add Expense</h1>
+
+<!-- ADD PAGE -->
+<div id="addPage">
+    <input type="text" id="description" placeholder="Description"><br><br>
+    <input type="number" id="amount" placeholder="Amount"><br><br>
+    <button onclick="addExpense()">Add Expense</button>
+</div>
+
+<!-- BUDGET PAGE -->
+<div id="budgetPage" class="hidden">
+    <div id="limitContainer"></div>
+</div>
+
+<!-- SUMMARY PAGE -->
+<div id="summaryPage" class="hidden">
+    <div id="summaryContainer"></div>
+    <hr>
+    <h3>History</h3>
+    <div id="historyContainer"></div>
+</div>
+
+<nav>
+    <button onclick="showPage('add')">Add</button>
+    <button onclick="showPage('budget')">Budget</button>
+    <button onclick="showPage('summary')">Summary</button>
+</nav>
+
+<!-- IMPORT JAVASCRIPT -->
+<script src="/static/script.js"></script>
+
+</body>
+</html>
