@@ -1,74 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense App</title>
-    <style>
-        body { 
-            font-family: Arial; 
-            margin: 0; 
-            padding: 20px; 
-        }
-
-        .hidden { 
-            display: none; 
-        }
-
-        nav { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            background: #eee; 
-            padding: 10px; 
-            text-align: center; 
-        }
-
-        button { 
-            padding: 8px 12px; 
-            margin: 5px; 
-            cursor: pointer;
-        }
-
-        input {
-            padding: 6px;
-            width: 200px;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<h1 id="pageTitle">Add Expense</h1>
+    <!-- HEADER -->
+    <header class="top-header">
+        <h1 id="pageTitle">Add Expense</h1>
+    </header>
 
-<!-- ADD PAGE -->
-<div id="addPage">
-    <input type="text" id="description" placeholder="Description"><br><br>
-    <input type="number" id="amount" placeholder="Amount"><br><br>
-    <button onclick="addExpense()">Add Expense</button>
-</div>
+    <!-- MAIN CONTENT -->
+    <main class="container">
 
-<!-- BUDGET PAGE -->
-<div id="budgetPage" class="hidden">
-    <div id="limitContainer"></div>
-</div>
+        <!-- ADD PAGE -->
+        <section id="addPage" class="page">
+            <div class="card">
+                <input type="text" id="description" placeholder="Description">
+                <input type="number" id="amount" placeholder="Amount">
+                <button onclick="addExpense()">Add Expense</button>
+            </div>
+        </section>
 
-<!-- SUMMARY PAGE -->
-<div id="summaryPage" class="hidden">
-    <div id="summaryContainer"></div>
-    <hr>
-    <h3>History</h3>
-    <div id="historyContainer"></div>
-</div>
+        <!-- BUDGET PAGE -->
+        <section id="budgetPage" class="page hidden">
+            <div id="limitContainer"></div>
+        </section>
 
-<nav>
-    <button onclick="showPage('add')">Add</button>
-    <button onclick="showPage('budget')">Budget</button>
-    <button onclick="showPage('summary')">Summary</button>
-</nav>
+        <!-- SUMMARY PAGE -->
+        <section id="summaryPage" class="page hidden">
+            <div id="summaryContainer"></div>
 
-<!-- IMPORT JAVASCRIPT -->
-<script src="/static/script.js"></script>
+            <div class="history-block">
+                <h3>History</h3>
+                <div id="historyContainer"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- NAVIGATION -->
+    <nav class="bottom-nav">
+        <button onclick="showPage('add')">Add</button>
+        <button onclick="showPage('budget')">Budget</button>
+        <button onclick="showPage('summary')">Summary</button>
+    </nav>
+
+    <script src="/static/script.js"></script>
 
 </body>
 </html>
