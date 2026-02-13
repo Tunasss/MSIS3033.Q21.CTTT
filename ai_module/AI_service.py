@@ -39,179 +39,106 @@ BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / 'expense_classifier_model.pkl'
 ENCODER_PATH = BASE_DIR / 'label_encoder.pkl'
 
-def clean_expense_description(text):
-    """
-    Standardizes input text for the AI model.
-
-    Args:
-        text (str): Raw user input (e.g., "Buy 2 Coffees!")
-
-    Returns:
-        str: Cleaned text (e.g., "buy coffees")
-    """
-    # Convert to lowercase to maintain consistency
+def clean_text(text):
+    """ Clean the user input before training or predicting """
+    # 1. Make text lowercase
     text = str(text).lower()
-    # Remove special characters and numbers, keep only letters and spaces
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
-    # Remove leading/trailing whitespaces
+    # 2. Keep only letters (a-z) and spaces. Remove numbers and symbols.
+    text = re.sub(r'[^a-z\s]', '', text)
+    # 3. Remove extra spaces at the beginning and end
     return text.strip()
 
 # ==============================================================================
-# SECTION 2: DATA LOADING & MODEL TRAINING (INTERNAL USE)
+# SECTION 2: TRAIN AND SAVE MODEL
 # ==============================================================================
 
-def train_and_save_model(csv_path='expense_data.csv'):
-    """
-    Loads data, trains the model, and saves artifacts for Backend use.
-    """
-    print("--- 1. STARTING MODEL TRAINING ---")
+def train_ai_model(csv_file = BASE_DIR / 'expense_data.csv'):
+    """ Train the AI using the CSV file and save it to .pkl files """
+    print("--- START TRAINING AI ---")
 
-    # 1. Load Dataset
+    # 1. Read CSV file
     try:
-        df = pd.read_csv(csv_path)
-        print(f"Data loaded successfully. Total records: {len(df)}")
+        df = pd.read_csv(csv_file)
+        print(f"Loaded {len(df)} rows from {csv_file}")
     except FileNotFoundError:
-        print("Error: 'expense_data.csv' not found. Please upload the dataset.")
+        print(f"Error: Cannot find {csv_file}. Please upload it.")
         return
 
-    # 2. Data Preprocessing
-    df['clean_description'] = df['description'].apply(clean_expense_description)
+    # 2. Clean the text data
+    df['clean_text'] = df['description'].apply(clean_text)
 
-    # 3. Encode Target Labels (Category -> Number)
-    label_encoder = LabelEncoder()
-    df['category_id'] = label_encoder.fit_transform(df['category'])
+    # 3. Change Category text to numbers (Encode)
+    # Example: Food -> 0, Shopping -> 1, Transport -> 2
+    encoder = LabelEncoder()
+    df['category_id'] = encoder.fit_transform(df['category'])
+    print(f"Categories found: {list(encoder.classes_)}")
 
-    print(f"Unique Categories Found: {list(label_encoder.classes_)}")
-
-    # 4. Split Data (Train 80% / Test 20%) - Good practice for validation
+    # 4. Split data (80% for learning, 20% for testing)
     X_train, X_test, y_train, y_test = train_test_split(
-        df['clean_description'], df['category_id'], test_size=0.2, random_state=42
+        df['clean_text'], df['category_id'], test_size=0.2, random_state=42
     )
 
-    # 5. Build Pipeline
-    # TfidfVectorizer: Converts text to vectors (ngram 1-2 captures phrases like "bus ticket")
-    # MultinomialNB: Naive Bayes classifier optimized for text data
-    model_pipeline = make_pipeline(TfidfVectorizer(ngram_range=(1, 2)), MultinomialNB())
+    # 5. Create and Train the Model (Naive Bayes)
+    ai_model = make_pipeline(TfidfVectorizer(ngram_range=(1, 2)), MultinomialNB())
+    ai_model.fit(X_train, y_train)
 
-    # 6. Train the Model
-    model_pipeline.fit(X_train, y_train)
+    # 6. Check Accuracy
+    predictions = ai_model.predict(X_test)
+    accuracy = accuracy_score(y_test, predictions)
+    print(f"AI Accuracy: {accuracy * 100:.2f}%")
 
-    # 7. Evaluate (Optional but recommended)
-    predictions = model_pipeline.predict(X_test)
-    acc = accuracy_score(y_test, predictions)
-    print(f"Model Training Completed. Validation Accuracy: {acc*100:.2f}%")
-
-    # 8. Save Model & Encoder (Persistence)
-    joblib.dump(model_pipeline, MODEL_PATH)
-    joblib.dump(label_encoder, ENCODER_PATH)
-    print(f"✅ Model saved to '{MODEL_PATH}'")
-    print(f"✅ Encoder saved to '{ENCODER_PATH}'")
+    # 7. Save the Brain (.pkl files) for Backend
+    joblib.dump(ai_model, MODEL_PATH)
+    joblib.dump(encoder, ENCODER_PATH)
+    print("✅ Saved Model to .pkl files successfully!")
 
 # ==============================================================================
-# SECTION 3: BACKEND INTERFACE (PUBLIC API)
+# SECTION 3: PREDICT FUNCTION (FOR TESTING)
 # ==============================================================================
-# NOTE FOR BACKEND DEV: Use the functions below to integrate with your system.
 
-# Load artifacts once at startup to improve performance
-try:
-    loaded_model = joblib.load(MODEL_PATH)
-    loaded_encoder = joblib.load(ENCODER_PATH)
-    print("\n--- SYSTEM READY: AI Model Loaded Successfully ---")
-except:
-    print("\n⚠️ WARNING: Model files not found. Run training first.")
-    loaded_model = None
-    loaded_encoder = None
-
-def predict_category(description):
-    """
-    Predicts the category of an expense based on its description.
-
-    Args:
-        description (str): The user's input string (e.g., "subway ticket")
-
-    Returns:
-        str: Predicted Category (e.g., "Transport") or "Others" if uncertain.
-    """
-    if not loaded_model:
-        return "Error: Model not loaded"
-
+def predict_category(text):
+    """ Predict the category of a new text """
+    # Load the model
     try:
-        cleaned_text = clean_expense_description(description)
-        # Predict returns an array of IDs
-        pred_id = loaded_model.predict([cleaned_text])
-        # Convert ID back to Label string
-        category_label = loaded_encoder.inverse_transform(pred_id)[0]
-        return category_label
-    except Exception as e:
-        print(f"Prediction Error: {e}")
+        model = joblib.load(MODEL_PATH)
+        encoder = joblib.load(ENCODER_PATH)
+    except:
+        return "Error: Cannot load model"
+
+    # Clean text
+    clean_input = clean_text(text)
+    if not clean_input:
         return "Others"
 
-def check_budget_alert(category, amount, user_limits):
-    """
-    Checks if the spending exceeds the user-defined limit for that category.
-
-    Args:
-        category (str): The category identified by AI.
-        amount (float): The amount spent.
-        user_limits (dict): Dictionary of limits (e.g., {"Food": 100}).
-
-    Returns:
-        str: Alert message or success confirmation.
-    """
-    if category in user_limits:
-        limit = user_limits[category]
-        if amount > limit:
-            return f"⚠️ ALERT: Your {category} spending (${amount}) exceeds limit (${limit})!"
-
-    return "✅ Within budget."
-
-def create_expense_record(description, amount, category):
-    """
-    Formats the data into a standardized JSON structure for Database storage.
-    Required by BA Report specifications.
-    """
-    return {
-        "description": description,
-        "amount": float(amount),
-        "category": category,
-        "created_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
+    # Predict
+    try:
+        predict_id = model.predict([clean_input])
+        category_name = encoder.inverse_transform(predict_id)[0]
+        return category_name
+    except:
+        return "Others"
 
 # ==============================================================================
-# SECTION 4: INTEGRATION TEST (DEMO)
+# SECTION 4: TEST THE CODE
 # ==============================================================================
 
 if __name__ == "__main__":
-    # 1. Run Training (Only need to run this once or when data updates)
-    # Uncomment the line below if you are running this for the first time:
-    train_and_save_model()
+    # Step 1: Train the AI (This creates the .pkl files)
+    train_ai_model(BASE_DIR / 'expense_data.csv')
 
-    # 2. Simulate Backend Workflow
-    print("\n" + "="*40)
-    print("   STARTING INTEGRATION TEST SCENARIO")
-    print("="*40)
+    # Step 2: Test the AI to see if it works
+    print("\n--- TEST AI PREDICTION ---")
 
-    # Mock Data (Simulating Frontend Input & User Settings)
-    test_case = "buying vegetables on market"
-    test_amount = 250.0
-    user_budget_settings = {
-        "Food": 200,
-        "Transport": 100,
-        "Shopping": 500
-    }
+# List of tests (5 category)
+    test_inputs = [
+        "lunch with friends",       # Food
+        "buying new sneakers",      # Shopping
+        "parking fee 50k",          # Transport
+        "notebook for class",       # Study
+        "pay electricity bill"      # Others
+    ]
 
-    print(f"1. User Input Received: '{test_case}' | Amount: ${test_amount}")
-
-    # Step A: AI Prediction
-    predicted_cat = predict_category(test_case)
-    print(f"2. AI Prediction      : {predicted_cat}")
-
-    # Step B: Logic Check
-    alert_status = check_budget_alert(predicted_cat, test_amount, user_budget_settings)
-    print(f"3. System Notification: {alert_status}")
-
-    # Step C: Database Preparation
-    db_record = create_expense_record(test_case, test_amount, predicted_cat)
-    print(f"4. Database Record    : {json.dumps(db_record, indent=4)}")
-
-    print("\n✅ TEST COMPLETED SUCCESSFULLY")
+    # Run tests and print results
+    for item in test_inputs:
+        result = predict_category(item)
+        print(f"Input: '{item}'  ==>  Category: {result}")
