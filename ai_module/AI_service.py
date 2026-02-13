@@ -10,7 +10,7 @@ Original file is located at
 """
 PROJECT: AI Expense Tracker (MVP)
 MODULE: Expense Classifier Service
-AUTHOR: AI Developer (Your Name)
+AUTHOR: AI Developer (Nguyen Ha Linh)
 DATE: 2024-05-20
 DESCRIPTION:
     This module trains a Naive Bayes model to categorize user expenses
