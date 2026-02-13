@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template  
 from flask_cors import CORS
 import pandas as pd
 import os
@@ -58,7 +58,7 @@ def load_limits():
 
 @app.route('/')
 def home():
-    return jsonify({"message": "Expense Tracker API", "status": "running"})
+    return render_template("index.html")
 
 @app.route('/api/expenses', methods=['GET'])
 def get_expenses():
