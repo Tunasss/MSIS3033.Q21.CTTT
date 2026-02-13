@@ -23,6 +23,7 @@ import re
 import joblib
 import datetime
 import json
+from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline
@@ -34,8 +35,9 @@ from sklearn.metrics import accuracy_score
 # SECTION 1: CONFIGURATION & UTILITIES
 # ==============================================================================
 
-MODEL_PATH = 'expense_classifier_model.pkl'
-ENCODER_PATH = 'label_encoder.pkl'
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / 'expense_classifier_model.pkl'
+ENCODER_PATH = BASE_DIR / 'label_encoder.pkl'
 
 def clean_expense_description(text):
     """
@@ -190,7 +192,7 @@ if __name__ == "__main__":
     print("="*40)
 
     # Mock Data (Simulating Frontend Input & User Settings)
-    test_case = "dinner with colleagues"
+    test_case = "buying vegetables on market"
     test_amount = 250.0
     user_budget_settings = {
         "Food": 200,
