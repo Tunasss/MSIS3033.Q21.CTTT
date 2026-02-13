@@ -4,8 +4,14 @@ import pandas as pd
 import os
 import uuid
 from datetime import datetime
-import json 
+import json
+import sys
+from pathlib import Path
 from db_init import init_db
+
+AI_MODULE_DIR = Path(__file__).resolve().parent.parent / "ai_module"
+sys.path.insert(0, str(AI_MODULE_DIR))
+from AI_service import predict_category
 app = Flask(__name__)
 CORS(app)
 
@@ -87,8 +93,10 @@ def add_expense():
         expense_id = str(uuid.uuid4())
         # generate timestamp
         current_time = datetime.now().isoformat()
-        # default catgegory (temporary)
-        category = "other"
+        # Predict category via AI service
+        category = predict_category(description)
+        if category.startswith("Error:"):
+            category = "Others"
         # create expense object
         new_expense = {
             "id": expense_id,
