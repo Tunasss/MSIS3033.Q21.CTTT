@@ -15,7 +15,6 @@
     <!-- HEADER -->
     <header class="top-header">
         <h1 id="pageTitle">Add Expense</h1>
-        <p class="page-subtitle">Track your money with calm clarity.</p>
     </header>
 
     <!-- MAIN CONTENT -->
@@ -23,18 +22,23 @@
 
         <!-- ADD PAGE -->
         <section id="addPage" class="page">
-            <div class="card glass">
-                <div class="input-group">
-                    <span class="field-icon material-symbols-rounded">receipt_long</span>
-                    <input type="text" id="description" placeholder="What did you spend on?">
+            <div class="card add-card">
+                <div class="add-group">
+                    <div class="add-label">
+                        <span class="add-label-icon icon-description"></span>
+                        What did you spend on?
+                    </div>
+                    <input class="add-input" type="text" id="description" placeholder="Example: Pizza and chicken">
                 </div>
-                <div class="input-group">
-                    <span class="field-icon material-symbols-rounded">payments</span>
-                    <input type="number" id="amount" placeholder="Enter amount">
+                <div class="add-group">
+                    <div class="add-label">
+                        <span class="add-label-icon icon-amount"></span>
+                        Enter amount
+                    </div>
+                    <input class="add-input" type="text" inputmode="numeric" id="amount" placeholder="Example: 150000">
                 </div>
-                <button class="primary-btn" type="button" onclick="addExpense()">
-                    <span class="material-symbols-rounded">add_circle</span>
-                    Add Expense
+                <button class="primary-btn add-btn" type="button" onclick="addExpense()">
+                    Add expense
                 </button>
             </div>
         </section>
@@ -46,13 +50,14 @@
 
         <!-- SUMMARY PAGE -->
         <section id="summaryPage" class="page hidden">
+            <h3 class="summary-heading">Expense summary</h3>
             <div id="summaryContainer"></div>
 
+            <div id="summaryTotal" class="total-bar"></div>
+
             <div class="history-block">
-                <h3 class="section-title">
-                    <span class="material-symbols-rounded">history</span>
-                    History
-                </h3>
+                <h3 class="history-heading">Expense history</h3>
+                <div id="historyDate" class="history-date"></div>
                 <div id="historyContainer"></div>
             </div>
         </section>
@@ -64,15 +69,15 @@
     <!-- NAVIGATION -->
     <nav class="bottom-nav">
         <button class="nav-btn" type="button" onclick="showPage('add')" id="navAdd">
-            <span class="material-symbols-rounded">folder</span>
+            <span class="nav-icon nav-icon-add"></span>
             <span>Add</span>
         </button>
         <button class="nav-btn" type="button" onclick="showPage('budget')" id="navBudget">
-            <span class="material-symbols-rounded">settings</span>
+            <span class="nav-icon nav-icon-budget"></span>
             <span>Budget</span>
         </button>
         <button class="nav-btn" type="button" onclick="showPage('summary')" id="navSummary">
-            <span class="material-symbols-rounded">analytics</span>
+            <span class="nav-icon nav-icon-summary"></span>
             <span>Overview</span>
         </button>
     </nav>
