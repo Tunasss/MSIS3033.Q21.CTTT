@@ -6,19 +6,23 @@ Expense Tracker Project - A web application for tracking and analyzing expenses 
 
 ```
 .
-├── frontend/           # Frontend application
-│   ├── index.html     # Main HTML page
-│   ├── style.css      # Stylesheet
-│   └── script.js      # JavaScript logic
-├── backend/           # Backend API
-│   ├── app.py         # Flask REST API
-│   └── requirements.txt  # Python dependencies
-├── ai_module/         # Machine Learning module
-│   ├── train.py       # Model training script
-│   └── model.pkl      # Trained ML model
-├── data/              # Data storage
-│   └── expenses.csv   # Expense records
-└── .gitignore         # Git ignore rules
+├── frontend/                          # Frontend application
+│   ├── index.html                     # Main HTML page
+│   ├── style.css                      # Stylesheet
+│   └── script.js                      # JavaScript logic
+├── backend/                           # Backend API
+│   ├── app.py                         # Flask REST API
+│   ├── db_init.py                     # Database initialization
+│   └── requirements.txt               # Python dependencies
+├── ai_module/                         # Machine Learning module
+│   ├── AI_service.py                  # Model training script
+│   ├── expense_classifier_model.pkl   # Trained ML model
+│   ├── expense_data.csv               # Dataset for training
+│   └── label_encoder.pkl              # Trained ML encoder
+├── data/                              # Data storage
+│   ├── expensve.csv                   # Expense records
+│   └── limits.json                    # Limits records
+└── .gitignore                         # Git ignore rules
 ```
 
 ## Setup Instructions
@@ -48,9 +52,11 @@ Open `frontend/index.html` in a web browser or serve with a local server.
 
 ## API Endpoints
 
-- `GET /` - API status
 - `GET /api/expenses` - Get all expenses
 - `POST /api/expenses` - Add new expense
+- `GET /api/limits` - Get all limits
+- `POST /api/limits` - Add new limit
+- `GET /api/sumary` - Get summary & history
 
 ## Requirements
 
