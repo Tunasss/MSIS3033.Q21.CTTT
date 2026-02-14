@@ -12,7 +12,13 @@ from db_init import init_db
 AI_MODULE_DIR = Path(__file__).resolve().parent.parent / "ai_module"
 sys.path.insert(0, str(AI_MODULE_DIR))
 from AI_service import predict_category
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "../frontend"),
+    static_folder=os.path.join(BASE_DIR, "../frontend")
+)
 CORS(app)
 
 # Path to data file

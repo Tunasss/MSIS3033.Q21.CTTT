@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense App</title>
-    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
@@ -50,7 +52,8 @@
         <button onclick="showPage('summary')">Summary</button>
     </nav>
 
-    <script src="/static/script.js"></script>
+    <!-- JS (đặt cuối body) -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 </html>
