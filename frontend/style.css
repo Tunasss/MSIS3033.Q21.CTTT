@@ -112,7 +112,7 @@ input:focus {
     padding: 20px 26px;
     border-radius: 16px;
     border: 1.5px solid #8fa1f2;
-    background: #f7f8ff;
+    background: #ffffff;
     font-size: 15px;
     user-select: text;
 }
@@ -592,16 +592,16 @@ nav button {
     margin-bottom: 0;
     padding: 12px 14px;
     border-radius: 14px;
-    border: 1.5px solid #8fa1f2;
-    background: #ffffff;
+    border: 1.5px solid #c7d0fb;
+    background: #f5f7ff;
     font-size: 14px;
     width: 100%;
     user-select: text;
 }
 
 .budget-limit-input:focus {
-    border-color: #7f92f0;
-    box-shadow: 0 0 0 3px rgba(143, 161, 242, 0.35);
+    border-color: #9aa6f8;
+    box-shadow: 0 0 0 3px rgba(154, 166, 248, 0.35);
 }
 
 .budget-status {
