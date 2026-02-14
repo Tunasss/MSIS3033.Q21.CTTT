@@ -5,13 +5,14 @@ import os
 import uuid
 from datetime import datetime
 import json
+import joblib
 import sys
 from pathlib import Path
 from db_init import init_db
 
 AI_MODULE_DIR = Path(__file__).resolve().parent.parent / "ai_module"
 sys.path.insert(0, str(AI_MODULE_DIR))
-from AI_service import predict_category
+from AI_service import predict_category, ENCODER_PATH
 app = Flask(__name__)
 CORS(app)
 
@@ -54,7 +55,36 @@ def load_limits():
     except:
         return {}
 
+def init_limits_if_missing():
+    """Initialize limits.json with 0 for all known categories if missing/empty."""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if os.path.exists(LIMIT_PATH):
+        try:
+            with open(LIMIT_PATH, "r") as f:
+                raw = json.load(f)
+            if isinstance(raw, dict) and len(raw) > 0:
+                return
+        except:
+            pass
 
+    categories = ["Food", "Transport", "Study", "Shopping", "Others"]
+    limits = {cat: 0 for cat in categories}
+    with open(LIMIT_PATH, "w") as f:
+        json.dump(limits, f, indent=4)
+
+def order_categories(categories):
+    """Return categories ordered by preferred display order, Others last."""
+    preferred = ["Food", "Transport", "Study", "Shopping", "Others"]
+    preferred_lower = [c.lower() for c in preferred]
+
+    def sort_key(cat):
+        cat_str = str(cat)
+        cat_lower = cat_str.lower()
+        if cat_lower in preferred_lower:
+            return (0, preferred_lower.index(cat_lower), cat_str)
+        return (1, 0, cat_str)
+
+    return sorted(categories, key=sort_key)
 
 @app.route('/')
 def home():
@@ -110,15 +140,16 @@ def add_expense():
         if os.path.exists(EXPENSE_PATH):
             existing_df = pd.read_csv(EXPENSE_PATH)
             df = pd.concat([existing_df, df], ignore_index = True)
-        df.to_csv(EXPENSE_PATH, index = False)
+        df.to_csv(EXPENSE_PATH, index =  False)
         # save category limits.json
         if os.path.exists(LIMIT_PATH):
             with open(LIMIT_PATH,"r") as f:
                 limits = json.load(f)
         else:
             limits = {}
-        # update the limit of specified category
-        limits[category] = 0
+        # set default limit only for new categories
+        if category not in limits:
+            limits[category] = 0
         # save back to limits.json
         with open(LIMIT_PATH, "w") as f:
             json.dump(limits, f, indent = 4)
@@ -174,9 +205,13 @@ def get_limits():
         if os.path.exists(LIMIT_PATH):
             with open(LIMIT_PATH, "r") as f:
                 limits = json.load(f)
-            return jsonify(limits), 200
+            ordered_keys = order_categories(limits.keys())
+            ordered_limits = [
+                {"category": k, "limit": limits[k]} for k in ordered_keys
+            ]
+            return jsonify(ordered_limits), 200
         else:
-            return jsonify({}), 200
+            return jsonify([]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 @app.route('/api/summary', methods=['GET'])
@@ -236,8 +271,8 @@ def get_summary():
 
         # union categories from expenses + limits (so limits-only categories still show)
         all_cats = set(spent_map.keys()) | set(limits.keys())
-        # optional: sort for stable output
-        all_cats = sorted([c for c in all_cats if str(c).strip() != ""])
+        all_cats = [c for c in all_cats if str(c).strip() != ""]
+        all_cats = order_categories(all_cats)
 
         categories_out = []
         for cat in all_cats:
@@ -258,4 +293,5 @@ def get_summary():
 
 if __name__ == '__main__':
     init_db()
+    init_limits_if_missing()
     app.run(debug=False, host='0.0.0.0', port=5000)
