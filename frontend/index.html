@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="top-header">
+        <h1 id="pageTitle">Add Expense</h1>
+        <p class="page-subtitle">Track your money with calm clarity.</p>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="container">
+
+        <!-- ADD PAGE -->
+        <section id="addPage" class="page">
+            <div class="card glass">
+                <div class="input-group">
+                    <span class="field-icon material-symbols-rounded">receipt_long</span>
+                    <input type="text" id="description" placeholder="What did you spend on?">
+                </div>
+                <div class="input-group">
+                    <span class="field-icon material-symbols-rounded">payments</span>
+                    <input type="number" id="amount" placeholder="Enter amount">
+                </div>
+                <button class="primary-btn" type="button" onclick="addExpense()">
+                    <span class="material-symbols-rounded">add_circle</span>
+                    Add Expense
+                </button>
+            </div>
+        </section>
+
+        <!-- BUDGET PAGE -->
+        <section id="budgetPage" class="page hidden">
+            <div id="limitContainer"></div>
+        </section>
+
+        <!-- SUMMARY PAGE -->
+        <section id="summaryPage" class="page hidden">
+            <div id="summaryContainer"></div>
+
+            <div class="history-block">
+                <h3 class="section-title">
+                    <span class="material-symbols-rounded">history</span>
+                    History
+                </h3>
+                <div id="historyContainer"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="bottom-nav">
+        <button class="nav-btn" type="button" onclick="showPage('add')" id="navAdd">
+            <span class="material-symbols-rounded">folder</span>
+            <span>Add</span>
+        </button>
+        <button class="nav-btn" type="button" onclick="showPage('budget')" id="navBudget">
+            <span class="material-symbols-rounded">settings</span>
+            <span>Budget</span>
+        </button>
+        <button class="nav-btn" type="button" onclick="showPage('summary')" id="navSummary">
+            <span class="material-symbols-rounded">analytics</span>
+            <span>Overview</span>
+        </button>
+    </nav>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
